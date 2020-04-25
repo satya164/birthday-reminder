@@ -44,8 +44,16 @@
   },
   "eslintConfig": {
     "extends": "satya164",
+    "env": {
+      "browser": true
+    },
     "globals": {
       "require": "readonly"
+    },
+    "settings": {
+      "import/core-modules": [
+        "react-native-screens"
+      ]
     }
   },
   "eslintIgnore": [

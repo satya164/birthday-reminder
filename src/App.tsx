@@ -1,13 +1,15 @@
 import * as React from 'react';
-import { StyleSheet, View } from 'react-native';
 import { AppLoading } from 'expo';
 import {
   Provider,
   DefaultTheme as PaperDefaultTheme,
-  Text,
 } from 'react-native-paper';
+import { enableScreens } from 'react-native-screens';
+import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from '@use-expo/font';
+import BirthdayList from './BirthdayList';
+import { StackParamList } from './types';
 
 const PaperTheme = {
   ...PaperDefaultTheme,
@@ -19,6 +21,8 @@ const PaperTheme = {
     Thin: { fontFamily: 'Lato-Thin' },
   },
 };
+
+const Stack = createNativeStackNavigator<StackParamList>();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -35,19 +39,16 @@ export default function App() {
   return (
     <Provider theme={PaperTheme}>
       <NavigationContainer>
-        <View style={styles.container}>
-          <Text>Open up App.js to start working on your app!</Text>
-        </View>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="BirthdayList"
+            component={BirthdayList}
+            options={{ title: '🎂 Birthdays' }}
+          />
+        </Stack.Navigator>
       </NavigationContainer>
     </Provider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+enableScreens();
