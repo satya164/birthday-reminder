@@ -13,6 +13,7 @@
   "dependencies": {
     "@expo/vector-icons": "^10.0.0",
     "@react-navigation/native": "^5.1.6",
+    "@use-expo/font": "^2.0.0",
     "expo": "~37.0.3",
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
@@ -42,9 +43,14 @@
     }
   },
   "eslintConfig": {
-    "extends": "satya164"
+    "extends": "satya164",
+    "globals": {
+      "require": "readonly"
+    }
   },
-  "eslintIgnore": ["node_modules/"],
+  "eslintIgnore": [
+    "node_modules/"
+  ],
   "prettier": {
     "tabWidth": 2,
     "useTabs": false,
