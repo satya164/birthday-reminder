@@ -3,8 +3,10 @@ export type StackParamList = {
 };
 
 export type Profile = {
-  id: number;
+  id: string;
   name: string;
   birthday: string;
   avatar: string;
 };
+
+export type ProfileUpdate = Omit<Profile, 'id'> & { id?: never };

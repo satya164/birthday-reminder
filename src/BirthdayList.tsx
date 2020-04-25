@@ -2,9 +2,9 @@ import * as React from 'react';
 import { SectionList, StyleSheet } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import BirthdayCard from './BirthdayCard';
+import ProfilesContext from './ProfilesContext';
 import useDate from './useDate';
 import { Profile } from './types';
-import data from './MOCK_DATA.json';
 
 type Category = 'today' | 'week' | 'month' | 'others';
 
@@ -18,8 +18,9 @@ const MONTH = DAY * 30;
 export default function BirthdayList() {
   const { colors } = useTheme();
   const date = useDate(MINUTE);
+  const { profiles } = React.useContext(ProfilesContext);
 
-  const categories = data.reduce<Record<Category, Profile[]>>(
+  const categories = profiles.reduce<Record<Category, Profile[]>>(
     (acc, curr) => {
       const birthday = new Date(curr.birthday);
 
@@ -62,7 +63,7 @@ export default function BirthdayList() {
         { backgroundColor: colors.background },
       ]}
       sections={sections}
-      keyExtractor={(item) => String(item.id)}
+      keyExtractor={(item) => item.id}
       renderItem={({ item }) => <BirthdayCard profile={item} />}
       renderSectionHeader={({ section: { id } }) => {
         const titles: Record<Category, string> = {

@@ -8,8 +8,11 @@ import { enableScreens } from 'react-native-screens';
 import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from '@use-expo/font';
+import { nanoid } from 'nanoid/non-secure';
 import BirthdayList from './BirthdayList';
-import { StackParamList } from './types';
+import ProfilesContext, { ProfilesContextType } from './ProfilesContext';
+import usePersistedState from './usePersistedState';
+import { StackParamList, Profile } from './types';
 
 const PaperTheme = {
   ...PaperDefaultTheme,
@@ -25,6 +28,11 @@ const PaperTheme = {
 const Stack = createNativeStackNavigator<StackParamList>();
 
 export default function App() {
+  const [isLoading, profiles, setProfiles] = usePersistedState<Profile[]>(
+    [],
+    'profiles'
+  );
+
   const [fontsLoaded] = useFonts({
     'Lato-Regular': require('../assets/fonts/Lato-Regular.ttf'),
     'Lato-Medium': require('../assets/fonts/Lato-Medium.ttf'),
@@ -32,20 +40,37 @@ export default function App() {
     'Lato-Thin': require('../assets/fonts/Lato-Thin.ttf'),
   });
 
-  if (!fontsLoaded) {
+  const profilesContext = React.useMemo<ProfilesContextType>(
+    () => ({
+      profiles,
+      add: (profile) =>
+        setProfiles((profiles) => [...profiles, { ...profile, id: nanoid() }]),
+      remove: (id) =>
+        setProfiles((profiles) => profiles.filter((p) => p.id !== id)),
+      update: (id, profile) =>
+        setProfiles((profiles) =>
+          profiles.map((p) => (p.id === id ? { ...p, ...profile } : p))
+        ),
+    }),
+    [profiles, setProfiles]
+  );
+
+  if (!fontsLoaded || isLoading) {
     return <AppLoading />;
   }
 
   return (
     <Provider theme={PaperTheme}>
       <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-            name="BirthdayList"
-            component={BirthdayList}
-            options={{ title: '🎂 Birthdays' }}
-          />
-        </Stack.Navigator>
+        <ProfilesContext.Provider value={profilesContext}>
+          <Stack.Navigator>
+            <Stack.Screen
+              name="BirthdayList"
+              component={BirthdayList}
+              options={{ title: '🎂 Birthdays' }}
+            />
+          </Stack.Navigator>
+        </ProfilesContext.Provider>
       </NavigationContainer>
     </Provider>
   );
