@@ -3,7 +3,7 @@ import { Profile, ProfileUpdate } from './types';
 
 export type ProfilesContextType = {
   profiles: Profile[];
-  add(profile: ProfileUpdate): void;
+  add(...profiles: ProfileUpdate[]): void;
   remove(id: string): void;
   update(id: string, profile: Partial<ProfileUpdate>): void;
 };

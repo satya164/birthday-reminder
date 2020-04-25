@@ -1,5 +1,6 @@
 export type StackParamList = {
   BirthdayList: undefined;
+  AddBirthday: undefined;
 };
 
 export type Profile = {

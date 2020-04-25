@@ -8,24 +8,36 @@ type Props = {
   profile: Profile;
 };
 
-const { format } = new Intl.DateTimeFormat('en', {
-  month: 'long',
-  day: '2-digit',
-});
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
-export default React.memo(function BirthdayCard({ profile: birthday }: Props) {
+export default React.memo(function BirthdayCard({ profile }: Props) {
+  const birthday = new Date(profile.birthday);
+
   return (
     <View style={styles.card}>
       <Row>
         <Avatar.Image
-          source={{ uri: birthday.avatar }}
+          source={{ uri: profile.avatar }}
           size={48}
           style={styles.avatar}
         />
         <View style={styles.content}>
-          <Text style={styles.name}>{birthday.name}</Text>
+          <Text style={styles.name}>{profile.name}</Text>
           <Text style={styles.birthday}>
-            {format(new Date(birthday.birthday))}
+            {birthday.getDate()} {months[birthday.getMonth()]}
           </Text>
         </View>
       </Row>

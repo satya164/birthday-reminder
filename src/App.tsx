@@ -5,11 +5,12 @@ import {
   DefaultTheme as PaperDefaultTheme,
 } from 'react-native-paper';
 import { enableScreens } from 'react-native-screens';
-import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { useFonts } from '@use-expo/font';
 import { nanoid } from 'nanoid/non-secure';
 import BirthdayList from './BirthdayList';
+import AddBirthday from './AddBirthday';
 import ProfilesContext, { ProfilesContextType } from './ProfilesContext';
 import usePersistedState from './usePersistedState';
 import { StackParamList, Profile } from './types';
@@ -25,7 +26,7 @@ const PaperTheme = {
   },
 };
 
-const Stack = createNativeStackNavigator<StackParamList>();
+const Stack = createStackNavigator<StackParamList>();
 
 export default function App() {
   const [isLoading, profiles, setProfiles] = usePersistedState<Profile[]>(
@@ -43,8 +44,11 @@ export default function App() {
   const profilesContext = React.useMemo<ProfilesContextType>(
     () => ({
       profiles,
-      add: (profile) =>
-        setProfiles((profiles) => [...profiles, { ...profile, id: nanoid() }]),
+      add: (...items) =>
+        setProfiles((profiles) => [
+          ...profiles,
+          ...items.map((profile) => ({ ...profile, id: nanoid() })),
+        ]),
       remove: (id) =>
         setProfiles((profiles) => profiles.filter((p) => p.id !== id)),
       update: (id, profile) =>
@@ -63,11 +67,16 @@ export default function App() {
     <Provider theme={PaperTheme}>
       <NavigationContainer>
         <ProfilesContext.Provider value={profilesContext}>
-          <Stack.Navigator>
+          <Stack.Navigator mode="modal">
             <Stack.Screen
               name="BirthdayList"
               component={BirthdayList}
               options={{ title: '🎂 Birthdays' }}
+            />
+            <Stack.Screen
+              name="AddBirthday"
+              component={AddBirthday}
+              options={{ title: 'Add a birthday' }}
             />
           </Stack.Navigator>
         </ProfilesContext.Provider>
