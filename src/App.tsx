@@ -16,6 +16,7 @@ import { useFonts } from '@use-expo/font';
 import { nanoid } from 'nanoid/non-secure';
 import BirthdayList from './BirthdayList';
 import AddBirthday from './AddBirthday';
+import EditProfile from './EditProfile';
 import IOSButton from './IOSButton';
 import ProfilesContext, { ProfilesContextType } from './ProfilesContext';
 import usePersistedState from './usePersistedState';
@@ -117,9 +118,15 @@ export default function App() {
             <Stack.Screen
               name="AddBirthday"
               component={AddBirthday}
-              options={{
-                title: 'Add a birthday',
-              }}
+              options={{ title: 'Add a birthday' }}
+            />
+            <Stack.Screen
+              name="EditProfile"
+              component={EditProfile}
+              options={({ route }) => ({
+                title:
+                  route.params.mode === 'edit' ? 'Edit profile' : 'Add profile',
+              })}
             />
           </Stack.Navigator>
         </ProfilesContext.Provider>

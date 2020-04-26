@@ -1,11 +1,13 @@
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text, Avatar } from 'react-native-paper';
+import { Text, Avatar, TouchableRipple } from 'react-native-paper';
+
 import Row from './Row';
 import { Profile } from './types';
 
 type Props = {
   profile: Omit<Profile, 'birthday'> & { birthday?: string };
+  onPress?: () => void;
 };
 
 const months = [
@@ -23,11 +25,11 @@ const months = [
   'December',
 ];
 
-export default React.memo(function BirthdayCard({ profile }: Props) {
+export default React.memo(function BirthdayCard({ profile, onPress }: Props) {
   const birthday = profile.birthday ? new Date(profile.birthday) : undefined;
 
   return (
-    <View style={styles.card}>
+    <TouchableRipple style={styles.card} onPress={onPress}>
       <Row>
         {profile.avatar ? (
           <Avatar.Image
@@ -46,12 +48,12 @@ export default React.memo(function BirthdayCard({ profile }: Props) {
           <Text style={styles.name}>{profile.name}</Text>
           <Text style={styles.birthday}>
             {birthday
-              ? `${birthday.getDate()} ${months[birthday.getMonth()]}`
+              ? `${months[birthday.getMonth()]} ${birthday.getDate()}`
               : '—'}
           </Text>
         </View>
       </Row>
-    </View>
+    </TouchableRipple>
   );
 });
 

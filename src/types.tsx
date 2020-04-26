@@ -1,6 +1,7 @@
 export type StackParamList = {
   BirthdayList: undefined;
   AddBirthday: undefined;
+  EditProfile: { profile: Partial<Profile>; mode: 'create' | 'edit' };
 };
 
 export type Profile = {
@@ -8,6 +9,7 @@ export type Profile = {
   name: string;
   birthday: string;
   avatar?: string;
+  phones?: string[];
 };
 
 export type ProfileUpdate = Omit<Profile, 'id'> & { id?: never };

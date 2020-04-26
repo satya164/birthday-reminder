@@ -1,35 +1,52 @@
 import * as React from 'react';
-import { View, TextInput, FlatList, StyleSheet } from 'react-native';
-import { Text, TouchableRipple, useTheme } from 'react-native-paper';
+import { View, FlatList, StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
 import * as Contacts from 'expo-contacts';
-import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import BirthdayCard from './BirthdayCard';
 import SectionDivider from './SectionDivider';
+import LargeButton from './LargeButton';
+import TextInput from './TextInput';
+import { StackParamList } from './types';
+
+type Props = {
+  navigation: StackNavigationProp<StackParamList, 'AddBirthday'>;
+};
 
 const hasBirthday = (contact: Contacts.Contact) =>
   contact.birthday && contact.birthday.day && contact.birthday.month;
 
 const ContactCard = React.memo(({ contact }: { contact: Contacts.Contact }) => {
+  const navigation = useNavigation<
+    StackNavigationProp<StackParamList, 'AddBirthday'>
+  >();
+
+  const profile = {
+    id: contact.id,
+    name: contact.name,
+    birthday:
+      contact.birthday && contact.birthday.day && contact.birthday.month
+        ? new Date(
+            contact.birthday.year || 1921,
+            contact.birthday.month,
+            contact.birthday.day
+          ).toUTCString()
+        : undefined,
+    avatar: contact.image?.uri,
+  };
+
   return (
     <BirthdayCard
-      profile={{
-        id: contact.id,
-        name: contact.name,
-        birthday:
-          contact.birthday && contact.birthday.day && contact.birthday.month
-            ? new Date(
-                contact.birthday.year || 1921,
-                contact.birthday.month,
-                contact.birthday.day
-              ).toUTCString()
-            : undefined,
-        avatar: contact.image?.uri,
-      }}
+      profile={profile}
+      onPress={() =>
+        navigation.replace('EditProfile', { profile, mode: 'create' })
+      }
     />
   );
 });
 
-export default function AddBirthday() {
+export default function AddBirthday({ navigation }: Props) {
   const { colors } = useTheme();
   const [name, setName] = React.useState('');
   const [contacts, setContacts] = React.useState<Contacts.Contact[]>([]);
@@ -70,25 +87,26 @@ export default function AddBirthday() {
         autoFocus
         onChangeText={setName}
         value={name}
-        style={styles.input}
         placeholder="Type a name"
       />
       {name ? (
-        <TouchableRipple
-          onPress={() => {}}
-          style={[styles.create, { backgroundColor: colors.primary }]}
-        >
-          <>
-            <Ionicons name="ios-add-circle" size={24} style={styles.icon} />
-            <Text style={styles.label}>Add &quot;{name}&quot;</Text>
-          </>
-        </TouchableRipple>
+        <LargeButton
+          icon="ios-add-circle"
+          onPress={() => {
+            navigation.replace('EditProfile', {
+              profile: { name },
+              mode: 'create',
+            });
+          }}
+          label={`Add "${name}"`}
+        />
       ) : null}
       {data.length ? <SectionDivider label="Or select from contacts" /> : null}
       <FlatList
         data={data}
         renderItem={({ item }) => <ContactCard contact={item} />}
         keyExtractor={(item) => item.id}
+        keyboardShouldPersistTaps="handled"
       />
     </View>
   );
@@ -97,26 +115,5 @@ export default function AddBirthday() {
 const styles = StyleSheet.create({
   container: {
     padding: 8,
-  },
-  create: {
-    margin: 8,
-    padding: 10,
-    borderRadius: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    color: 'white',
-  },
-  icon: {
-    color: 'white',
-    marginRight: 16,
-  },
-  input: {
-    backgroundColor: 'white',
-    margin: 8,
-    padding: 12,
-    borderRadius: 5,
   },
 });
