@@ -1,6 +1,11 @@
 import * as React from 'react';
-import { SectionList, Platform, StyleSheet } from 'react-native';
-import { Text, TouchableRipple, useTheme } from 'react-native-paper';
+import {
+  SectionList,
+  TouchableOpacity,
+  Platform,
+  StyleSheet,
+} from 'react-native';
+import { Appbar, Text, useTheme } from 'react-native-paper';
 import { NativeStackNavigationProp } from 'react-native-screens/native-stack';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import BirthdayCard from './BirthdayCard';
@@ -64,25 +69,31 @@ export default function BirthdayList({ navigation }: Props) {
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableRipple
-          borderless
-          style={styles.button}
-          onPress={() => navigation.navigate('AddBirthday')}
-        >
-          <MaterialCommunityIcons name="account-plus" size={24} />
-        </TouchableRipple>
-      ),
+      headerRight: () =>
+        Platform.select({
+          android: (
+            <Appbar.Action
+              icon="account-plus"
+              onPress={() => navigation.navigate('AddBirthday')}
+            />
+          ),
+          ios: (
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('AddBirthday')}
+            >
+              <MaterialCommunityIcons name="account-plus" size={20} />
+            </TouchableOpacity>
+          ),
+        }),
     });
   }, [navigation]);
 
   return (
     <React.Fragment>
       <SectionList
-        contentContainerStyle={[
-          styles.content,
-          { backgroundColor: colors.background },
-        ]}
+        style={{ backgroundColor: colors.background }}
+        contentContainerStyle={styles.content}
         sections={sections}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <BirthdayCard profile={item} />}

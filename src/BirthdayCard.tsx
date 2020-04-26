@@ -5,7 +5,7 @@ import Row from './Row';
 import { Profile } from './types';
 
 type Props = {
-  profile: Profile;
+  profile: Omit<Profile, 'birthday'> & { birthday?: string };
 };
 
 const months = [
@@ -24,20 +24,30 @@ const months = [
 ];
 
 export default React.memo(function BirthdayCard({ profile }: Props) {
-  const birthday = new Date(profile.birthday);
+  const birthday = profile.birthday ? new Date(profile.birthday) : undefined;
 
   return (
     <View style={styles.card}>
       <Row>
-        <Avatar.Image
-          source={{ uri: profile.avatar }}
-          size={48}
-          style={styles.avatar}
-        />
+        {profile.avatar ? (
+          <Avatar.Image
+            source={{ uri: profile.avatar }}
+            size={48}
+            style={styles.avatar}
+          />
+        ) : (
+          <Avatar.Text
+            label={profile.name[0]}
+            size={48}
+            style={styles.avatar}
+          />
+        )}
         <View style={styles.content}>
           <Text style={styles.name}>{profile.name}</Text>
           <Text style={styles.birthday}>
-            {birthday.getDate()} {months[birthday.getMonth()]}
+            {birthday
+              ? `${birthday.getDate()} ${months[birthday.getMonth()]}`
+              : '—'}
           </Text>
         </View>
       </Row>

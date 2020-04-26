@@ -1,16 +1,22 @@
 import * as React from 'react';
+import { Platform, StyleSheet } from 'react-native';
 import { AppLoading } from 'expo';
 import {
   Provider,
   DefaultTheme as PaperDefaultTheme,
+  Appbar,
 } from 'react-native-paper';
 import { enableScreens } from 'react-native-screens';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import {
+  createStackNavigator,
+  TransitionPresets,
+} from '@react-navigation/stack';
 import { useFonts } from '@use-expo/font';
 import { nanoid } from 'nanoid/non-secure';
 import BirthdayList from './BirthdayList';
 import AddBirthday from './AddBirthday';
+import IOSButton from './IOSButton';
 import ProfilesContext, { ProfilesContextType } from './ProfilesContext';
 import usePersistedState from './usePersistedState';
 import { StackParamList, Profile } from './types';
@@ -67,7 +73,42 @@ export default function App() {
     <Provider theme={PaperTheme}>
       <NavigationContainer>
         <ProfilesContext.Provider value={profilesContext}>
-          <Stack.Navigator mode="modal">
+          <Stack.Navigator
+            mode="modal"
+            screenOptions={({ navigation, route }) => {
+              const isFirstScreen =
+                navigation.dangerouslyGetState().routes.indexOf(route) === 0;
+
+              return {
+                headerStyle: {
+                  elevation: 0,
+                  borderBottomWidth: Platform.select({
+                    ios: undefined,
+                    default: StyleSheet.hairlineWidth,
+                  }),
+                },
+                headerTitleStyle: { fontFamily: 'Lato-Medium' },
+                headerLeft: isFirstScreen
+                  ? undefined
+                  : ({ onPress }) =>
+                      Platform.select({
+                        ios: <IOSButton onPress={onPress}>Cancel</IOSButton>,
+                        default: (
+                          <Appbar.Action icon="close" onPress={onPress} />
+                        ),
+                      }),
+                // @ts-ignore
+                ...Platform.select({
+                  ios: {
+                    cardOverlayEnabled: true,
+                    headerStatusBarHeight: isFirstScreen ? undefined : 0,
+                    ...TransitionPresets.ModalPresentationIOS,
+                  },
+                  default: TransitionPresets.ScaleFromCenterAndroid,
+                }),
+              };
+            }}
+          >
             <Stack.Screen
               name="BirthdayList"
               component={BirthdayList}
@@ -76,7 +117,9 @@ export default function App() {
             <Stack.Screen
               name="AddBirthday"
               component={AddBirthday}
-              options={{ title: 'Add a birthday' }}
+              options={{
+                title: 'Add a birthday',
+              }}
             />
           </Stack.Navigator>
         </ProfilesContext.Provider>
