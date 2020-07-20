@@ -2,6 +2,10 @@ import * as React from 'react';
 import { Platform, StyleSheet } from 'react-native';
 import { AppLoading } from 'expo';
 import {
+  getAllScheduledNotificationsAsync,
+  scheduleNotificationAsync,
+} from 'expo-notifications';
+import {
   Provider,
   DefaultTheme as PaperDefaultTheme,
   Appbar,
@@ -65,6 +69,36 @@ export default function App() {
     }),
     [profiles, setProfiles]
   );
+
+  React.useEffect(() => {
+    const syncNotifications = async () => {
+      const notifications = await getAllScheduledNotificationsAsync();
+
+      console.log({ notifications });
+
+      try {
+        await Promise.all(
+          profiles.map((profile) =>
+            scheduleNotificationAsync({
+              identifier: profile.id,
+              content: {
+                title: `🎂 Today is ${profile.name}'s birthday!`,
+                body: 'Wish him all the best',
+                sound: true,
+              },
+              trigger: {
+                seconds: 60,
+              },
+            })
+          )
+        );
+      } catch (err) {
+        console.warn(err);
+      }
+    };
+
+    syncNotifications();
+  }, [profiles]);
 
   if (!fontsLoaded || isLoading) {
     return <AppLoading />;
